@@ -10,7 +10,7 @@ import java.sql.ResultSet
 class TodoRepository(val jdbcTemplate: JdbcTemplate) : TodoServiceInterface {
     override fun getTodos(): List<Todo> {
         return jdbcTemplate.query(
-                """select userId, id, title, completed from todo"""
+                """select userId, id, title, completed from todo order by id"""
         ) { rs: ResultSet, _:Int ->
             Todo(rs.getInt("userId"),
                     rs.getInt("id"),
