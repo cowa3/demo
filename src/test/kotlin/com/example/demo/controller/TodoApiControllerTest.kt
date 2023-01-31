@@ -12,40 +12,50 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.*
 
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@DBRider
 class TodoApiControllerTest {
+    @Autowired
+    lateinit var restTemplate: TestRestTemplate
 
-    @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-    @DBRider
-    class TodoApiControllerTest {
-        @Autowired
-        lateinit var restTemplate: TestRestTemplate
+    @Test
+    @DataSet(value = ["todo.yml"])
+    fun タスク一覧を取得できる() {
+        val header = HttpHeaders()
+        header.contentType = MediaType.APPLICATION_JSON
 
-        @Test
-        @DataSet(value = ["todo.yml"])
-        fun タスク一覧を取得できる() {
+        val response = restTemplate.exchange("/todos", HttpMethod.GET, HttpEntity(null, header), String::class.java)
+        val mapper = jacksonObjectMapper()
+        val articles: List<Todo> = mapper.readValue(response.body!!)
 
-            val header = HttpHeaders()
-            header.contentType = MediaType.APPLICATION_JSON
-
-            val response = restTemplate.exchange("/todos", HttpMethod.GET, HttpEntity(null, header), String::class.java)
-            val mapper = jacksonObjectMapper()
-            val articles: List<Todo> = mapper.readValue(response.body!!)
-            assertResult (response, articles, 2)
-
+        Assertions.assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        Assertions.assertThat(articles.size).isEqualTo(2)
+        articles.forEachIndexed { index, todo ->
+            val userId: Int = index + 1
+            assertTodo(todo, userId)
         }
+    }
 
-        fun assertResult (response: ResponseEntity<String>, articles: List<Todo>, size: Int) {
+    @Test
+    @DataSet(value = ["todo.yml"])
+    fun タスクを作成できる() {
+        val header = HttpHeaders()
+        header.contentType = MediaType.APPLICATION_JSON
+        val userId = 3
+        val requestBody = TodoRequestBody(userId, "task${userId}")
 
-            Assertions.assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-            Assertions.assertThat(articles.size).isEqualTo(size)
+        val response = restTemplate.exchange("/todos", HttpMethod.POST, HttpEntity(requestBody, header), String::class.java)
+        val mapper = jacksonObjectMapper()
+        val todo: Todo = mapper.readValue(response.body!!)
 
-            articles.forEachIndexed {index, todo ->
-                Assertions.assertThat(todo.userId).isEqualTo(index + 1)
-                Assertions.assertThat(todo.id).isEqualTo(index + 1)
-                Assertions.assertThat(todo.title).isEqualTo("task" + (index + 1))
-                Assertions.assertThat(todo.completed).isEqualTo(false)
-            }
+        Assertions.assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
+        assertTodo(todo, 3)
+    }
 
-        }
+    fun assertTodo(todo: Todo, userId: Int) {
+        Assertions.assertThat(todo.userId).isEqualTo(userId)
+        Assertions.assertThat(todo.id).isInstanceOf(Integer::class.java)
+        Assertions.assertThat(todo.title).isEqualTo("task${userId}")
+        Assertions.assertThat(todo.completed).isEqualTo(false)
     }
 }

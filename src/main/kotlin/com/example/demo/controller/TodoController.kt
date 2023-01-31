@@ -2,9 +2,7 @@ package com.example.demo.controller
 
 import com.example.demo.model.Todo
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.ResponseStatus
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 class TodoController(private val todoService: TodoControllerInterface) {
@@ -12,5 +10,11 @@ class TodoController(private val todoService: TodoControllerInterface) {
     @ResponseStatus(HttpStatus.OK)
     fun getTodos() : List<Todo> {
         return todoService.getTodos()
+    }
+
+    @PostMapping("/todos")
+    @ResponseStatus(HttpStatus.CREATED)
+    fun createTodos(@RequestBody requestBody: TodoRequestBody) : Todo {
+        return todoService.createTodos(requestBody)
     }
 }

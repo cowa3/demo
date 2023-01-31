@@ -4,4 +4,6 @@ import com.example.demo.model.Todo
 
 interface TodoServiceInterface {
     fun getTodos(): List<Todo>
+
+    fun createTodos(requestBody: TodoRequestBody): Todo
 }

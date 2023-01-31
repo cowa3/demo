@@ -9,4 +9,8 @@ class TodoService(private val todoRepository: TodoServiceInterface): TodoControl
     override fun getTodos(): List<Todo> {
         return todoRepository.getTodos()
     }
+
+    override fun createTodos(requestBody: TodoRequestBody): Todo {
+        return todoRepository.createTodos(requestBody);
+    }
 }
