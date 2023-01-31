@@ -1,6 +1,7 @@
 package com.example.demo.controller
 
 import com.example.demo.model.Todo
+import com.example.demo.model.TodoRequestBody
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 

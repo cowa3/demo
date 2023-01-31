@@ -6,3 +6,9 @@ data class Todo(
         val title: String,
         val completed: Boolean
 )
+
+
+data class TodoRequestBody(
+        val userId: Int,
+        val title: String,
+)

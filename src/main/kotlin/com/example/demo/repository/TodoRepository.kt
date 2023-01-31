@@ -1,6 +1,7 @@
 package com.example.demo.repository
 
 import com.example.demo.model.Todo
+import com.example.demo.model.TodoRequestBody
 import com.example.demo.service.TodoServiceInterface
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Repository
